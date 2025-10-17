@@ -8,45 +8,70 @@ import com.henrique.bankplus.entities.Client;
 
 public class ClientService {
 
-    private final Connection connection;
-    private final ClientDAO clientDAO;
+    private Connection conn;
 
-    public ClientService(Connection connection) {
-        this.connection = connection;
-        this.clientDAO = new ClientDAO(connection);
+    public ClientService(Connection conn) {
+        this.conn = conn;
     }
 
-    public void transfer(String senderCpf, String receiverCpf, double amount) {
-        
-        if (amount <= 0.0) {
-            throw new IllegalArgumentException("Amount must be positive");
-        }
+    public void trasnference(String receiverCpf, String senderCpf, Double amountTransfer){
 
-        boolean previousAutoCommit;
+            
+
+
         try {
-            previousAutoCommit = connection.getAutoCommit();
-            connection.setAutoCommit(false);
+            
+            conn.setAutoCommit(false); // inicia transação manual
 
-            // Opcional: bloquear as linhas durante a transação para evitar corrida:
-            // SELECT ... FOR UPDATE (se quiser, crie um método específico no DAO)
-            Client sender   = clientDAO.findByCpf(senderCpf);
+            ClientDAO clientDAO = new ClientDAO(conn);
+            Client sender = clientDAO.findByCpf(senderCpf);
             Client receiver = clientDAO.findByCpf(receiverCpf);
 
-            if (sender == null || receiver == null) {
-                throw new IllegalArgumentException("Sender or receiver not found");
-            }
-            if (sender.getBalance() == null || sender.getBalance() < amount) {
-                throw new IllegalStateException("Insufficient funds");
+             // valida se o remetente existe
+            if (sender == null) {
+                throw new SQLException("Sender not found with CPF: " + senderCpf);
             }
 
-            clientDAO.updateBalance(senderCpf,   sender.getBalance() - amount);
-            clientDAO.updateBalance(receiverCpf, receiver.getBalance() + amount);
+            // valida se o destinatário existe
+            if (receiver == null) {
+                throw new SQLException("Receiver not found with CPF: " + receiverCpf);
+            }
 
-            connection.commit();
-            connection.setAutoCommit(previousAutoCommit);
+            // valida saldo suficiente
+            if (sender.getBalance() < amountTransfer) {
+                throw new SQLException("Insufficient funds for CPF: " + senderCpf);
+            }
+
+            // calcula novos saldos
+            double newSenderBalance = sender.getBalance() - amountTransfer;
+            double newReceiverBalance = receiver.getBalance() + amountTransfer;
+
+            clientDAO.updateBalance(senderCpf, newSenderBalance);
+            clientDAO.updateBalance(receiverCpf, newReceiverBalance);
+
+            conn.commit(); // confirma tudo de uma vez
+
         } catch (SQLException e) {
-            try { connection.rollback(); } catch (SQLException ignore) {}
-            throw new RuntimeException(e);
+            try {
+
+                conn.rollback(); // desfaz todas as alterações
+                System.err.println("Transaction rolled back due to an error.");
+            } 
+            catch (SQLException rollbackEx) {
+
+                rollbackEx.printStackTrace();
+
+            }
+        } finally {
+
+            try {
+                conn.setAutoCommit(true); // volta ao modo padrão
+            } 
+            catch (SQLException e) {
+
+                e.printStackTrace();
+
+            }
         }
     }
 }

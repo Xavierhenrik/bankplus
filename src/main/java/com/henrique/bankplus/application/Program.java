@@ -116,7 +116,8 @@ public class Program {
                 case 3:
 
                     
-                    
+                    ClientService clientService = new ClientService(conn);
+
                     System.out.println("Enter the CPF of the account to be credited");
                     String senderCpf = Validations.validateCpf();
 
@@ -126,7 +127,7 @@ public class Program {
                     System.out.println("Enter the transfer amount");
                     Double transferAmount = Validations.validateAmount();
 
-                    ClientService.transfer(senderCpf, reciverCpf, transferAmount);
+                    clientService.trasnference(reciverCpf, senderCpf, transferAmount);
 
 
 

@@ -1,7 +1,9 @@
 package com.henrique.bankplus.application;
 import com.henrique.bankplus.db.DB;
-import com.henrique.bankplus.entities.Client;
-import com.henrique.bankplus.DAO.ClientDAO;
+// import com.henrique.bankplus.entities.Client;
+import com.henrique.bankplus.service.ClientService;
+import com.henrique.bankplus.utils.Validations;
+// import com.henrique.bankplus.DAO.ClientDAO;
 
 import java.sql.Connection;
 import java.util.Scanner;
@@ -13,27 +15,20 @@ public class testedb {
         Scanner sc = new Scanner(System.in);
         Connection conn = null;
         conn = DB.getConnection();
-        ClientDAO clientDAO = new ClientDAO(conn);
 
-        // recebe o cpf
-        System.out.println("Enter the client CPF:");
-        String deletecpf = sc.nextLine();
 
-        Client objClient = clientDAO.findByCpf(deletecpf); 
+        ClientService clientService = new ClientService(conn);
 
-        // confirma a deleção
-        System.out.println(objClient.toString());
+        System.out.println("Enter the CPF of the account to be debited");
+        String senderCpf = Validations.validateCpf();
 
-        System.out.println("Are you sure you want to delete this client? (y/n)");
-        String opDel = sc.nextLine().toUpperCase();
+        System.out.println("Enter the CPF of the account to be credited");
+        String reciverCpf = Validations.validateCpf();
 
-        if (opDel.equals(opDel)) {
-            System.out.println("Client with Cpf " + deletecpf + " deleted successfully!");
-            clientDAO.deleteClient(deletecpf);
-        } 
-        else {
-            System.out.println("Deletion cancelled.");
-        }
+        System.out.println("Enter the transfer amount");
+        Double transferAmount = Validations.validateAmount();
+
+        clientService.trasnference(reciverCpf, senderCpf, transferAmount);
 
 
 
@@ -44,9 +39,10 @@ public class testedb {
 
 
 
-    DB.closeConnection();
-    sc.close();
+        DB.closeConnection();
+        sc.close();
     }
+
 
 }
 
