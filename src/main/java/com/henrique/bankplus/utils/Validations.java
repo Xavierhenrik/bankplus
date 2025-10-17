@@ -1,5 +1,7 @@
 package com.henrique.bankplus.utils;
 
+import java.util.Scanner;
+
 public class Validations {
 
     /**
@@ -11,39 +13,99 @@ public class Validations {
      * você pediu que se tivesse 11 dígitos retornasse "x". Se quiser validar o
      * checksum (dígitos), eu adiciono sem problema.
      */
-    public static String validateCpf(String cpf) {
-        if (cpf == null) {
-            return "CPF nulo";
-        }
+    
+    public static String validateCpf() {
+        Scanner sc = new Scanner(System.in);
+        String cpf;
 
-        String original = cpf; // só para referência ou logs, se precisar
-        // remove pontos, traços e espaços comuns (aceitamos esses separadores)
-        String cleaned = cpf.replaceAll("[\\.\\-\\s]", "");
+        while (true) {
+            cpf = sc.nextLine();
 
-        // Se havia letras (ex.: "123a45..."), detectamos isso pelo original
-        if (original.matches(".*[A-Za-z].*")) {
-            return "CPF contém letras (caracteres inválidos)";
-        }
+            String original = cpf;
+            String cleaned = cpf.replaceAll("[\\.\\-\\s]", "");
 
-        // agora cleaned deve conter apenas dígitos; se tiver outros símbolos, erro
-        if (!cleaned.matches("\\d+")) {
-            return "CPF contém caracteres inválidos";
-        }
+            if (cpf == null || cpf.isEmpty()) {
+                System.out.println("CPF cannot be empty");
+                continue;
+            }
 
-        // tamanho
-        if (cleaned.length() < 11) {
-            return "CPF com menos de 11 dígitos";
-        }
-        if (cleaned.length() > 11) {
-            return "CPF com mais de 11 dígitos";
-        }
+            if (original.matches(".*[A-Za-z].*")) {
+                System.out.println("CPF contains letters (invalid characters)");
+                continue;
+            }
 
-        // caso todos os dígitos sejam iguais (00000000000, 11111111111, ...) — CPF inválido
-        if (cleaned.matches("(\\d)\\1{10}")) {
-            return "CPF com todos os dígitos iguais (inválido)";
-        }
+            if (!cleaned.matches("\\d+")) {
+                System.out.println("CPF contains invalid characters");
+                continue;
+            }
 
-        // Se chegou aqui, cleaned.length() == 11
-        return "x";
+            if (cleaned.length() < 11) {
+                System.out.println("CPF has less than 11 digits");
+                continue;
+            }
+
+            if (cleaned.length() > 11) {
+                System.out.println("CPF has more than 11 digits");
+                continue;
+            }
+
+            if (cleaned.matches("(\\d)\\1{10}")) {
+                System.out.println("CPF has all digits equal (invalid)");
+                continue;
+            }
+
+            // Se chegou aqui, o CPF está correto
+            System.out.println("CPF accepted!");
+            return cleaned; // retorna o CPF limpo
+        }
+    }
+
+    public static double validateAmount() {
+        Scanner sc = new Scanner(System.in);
+        double amount;
+
+        while (true) {
+
+            if (!sc.hasNextDouble()) {
+                System.out.println("Invalid input, please enter a numeric value");
+                sc.next(); // limpa a entrada inválida
+                continue;
+            }
+
+            amount = sc.nextDouble();
+
+            if (Double.isNaN(amount)) {
+                System.out.println("Amount is not a number (NaN)");
+                continue;
+            }
+
+            if (Double.isInfinite(amount)) {
+                System.out.println("Amount is infinite (invalid value)");
+                continue;
+            }
+
+            if (amount < 0) {
+                System.out.println("Negative amount not allowed");
+                continue;
+            }
+
+            if (amount == 0) {
+                System.out.println("Amount cannot be zero");
+                continue;
+            }
+
+            // Verifica se tem mais de duas casas decimais
+            String text = String.valueOf(amount);
+            if (text.contains(".")) {
+                int decimalPlaces = text.length() - text.indexOf('.') - 1;
+                if (decimalPlaces > 2) {
+                    System.out.println("Amount has more than two decimal places");
+                    continue;
+                }
+            }
+
+            System.out.println("Amount accepted!");
+            return amount;
+        }
     }
 }

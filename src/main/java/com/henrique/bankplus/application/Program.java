@@ -9,6 +9,7 @@ import java.sql.Connection;
 
 import java.util.Locale;
 import com.henrique.bankplus.entities.Client;
+import com.henrique.bankplus.service.ClientService;
 import com.henrique.bankplus.utils.Validations;
 
 
@@ -64,23 +65,11 @@ public class Program {
                             System.out.println("Ivalid name, Try again!\n Make sure it contains only letters.");
 
                     }
+                    
 
-                    while (true) {
+                    System.out.println("CPF: ");
+                    cpf = Validations.validateCpf();
 
-                        System.out.println("CPF: ");
-                        cpf = sc.nextLine();
-
-                        // remove pontos e hifens
-                        cpf = cpf.replace(".", "").replace("-", "");
-
-                        // valida tamanho
-                        if (cpf.length() != 11)
-                            System.out.println("Invalid CPF. Must contain 11 numbers without periods or dashes.");
-                            
-                        else
-                            break;
-
-                    }
 
                     while (true) {
                         
@@ -90,7 +79,8 @@ public class Program {
                         if (opId.equals("Y")) {
 
                             System.out.println("Enter the deposit amount: ");
-                            balance = sc.nextInt();
+                            balance = Validations.validateAmount();
+
                         }
                             break;
                     }
@@ -103,7 +93,7 @@ public class Program {
 
                     // recebe o cpf
                     System.out.println("Enter the client CPF:");
-                    String cpfToDelete = sc.nextLine();
+                    String cpfToDelete = Validations.validateCpf();
 
                     Client objClient = clientDAO.findByCpf(cpfToDelete);
 
@@ -125,24 +115,18 @@ public class Program {
                 
                 case 3:
 
-                    System.out.println("Enter the sender's CPF: ");
+                    
+                    
+                    System.out.println("Enter the CPF of the account to be credited");
+                    String senderCpf = Validations.validateCpf();
 
-                     while (true) {
+                    System.out.println("Enter the CPF of the account to be debited");
+                    String reciverCpf = Validations.validateCpf();
 
-                        String senderCpf = sc.nextLine();
-                        String validation = Validations.validateCpf(senderCpf);
+                    System.out.println("Enter the transfer amount");
+                    Double transferAmount = Validations.validateAmount();
 
-                        if (validation.equals("x")){
-                            break;
-                        } else {
-                            System.out.println(validation);
-                        }
-
-                    }
-
-
-
-
+                    ClientService.transfer(senderCpf, reciverCpf, transferAmount);
 
 
 
