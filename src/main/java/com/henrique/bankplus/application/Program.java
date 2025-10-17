@@ -9,6 +9,7 @@ import java.sql.Connection;
 
 import java.util.Locale;
 import com.henrique.bankplus.entities.Client;
+import com.henrique.bankplus.utils.Validations;
 
 
 public class Program {
@@ -121,9 +122,23 @@ public class Program {
                     }
 
                     break;
+                
                 case 3:
 
-                    
+                    System.out.println("Enter the sender's CPF: ");
+
+                     while (true) {
+
+                        String senderCpf = sc.nextLine();
+                        String validation = Validations.validateCpf(senderCpf);
+
+                        if (validation.equals("x")){
+                            break;
+                        } else {
+                            System.out.println(validation);
+                        }
+
+                    }
 
 
 

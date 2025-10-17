@@ -125,12 +125,5 @@ public class ClientDAO {
         }
     }
 
-    public void internalTrasaction(String senderCPF, String receriverCPF, double amount) {
-
-        
-
-        
-
-    }
 
 }

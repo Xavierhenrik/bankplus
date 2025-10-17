@@ -17,6 +17,7 @@ public class ClientService {
     }
 
     public void transfer(String senderCpf, String receiverCpf, double amount) {
+        
         if (amount <= 0.0) {
             throw new IllegalArgumentException("Amount must be positive");
         }
