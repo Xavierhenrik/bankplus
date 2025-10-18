@@ -20,6 +20,7 @@ public class ClientDAO  {
 
 
     // insert client
+    
     public void insertClient(Client obj) {
 
         PreparedStatement st = null;
@@ -50,6 +51,7 @@ public class ClientDAO  {
         PreparedStatement st = null;
 
         try {
+
             st = conn.prepareStatement(
                 "UPDATE clients "
                 + "SET balance = ? "
@@ -67,6 +69,31 @@ public class ClientDAO  {
             DB.closeStatement(st);
         }
     }
+
+    public void updateName(String cpf, String newName) {
+
+        PreparedStatement st = null;
+
+        try {
+            
+            st = conn.prepareStatement(
+                "UPDATE clients "
+                + "SET name = ? " 
+                + "WHERE cpf = ?"
+            );
+    
+            st.setString(1, newName);
+            st.setString(2, cpf);
+    
+            st.executeUpdate();
+    
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DB.closeStatement(st);
+        }
+    }
+
 
     // deleta cliente buscando pelo cpf 
     public void deleteClient(String cpf) {
