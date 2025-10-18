@@ -9,7 +9,7 @@ import com.henrique.bankplus.entities.Client;
 import java.sql.ResultSet;
 
 
-public class ClientDAO {
+public class ClientDAO  {
 
     private Connection conn;
 
